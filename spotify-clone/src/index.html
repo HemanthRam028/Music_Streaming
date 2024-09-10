@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Streaming App</title>
+  <link
+    rel="icon"
+    href="Music_logo.png"
+    type="image/x-icon"
+  />
+  <link rel="stylesheet" href="%PUBLIC_URL%/styles.css">
+</head>
+
+    <body>
+
+        <div class="container">
+            <h1>Music</h1>
+            <div class="login-container">
+                <buttom id="login-btn" class="btn">Login with Google</buttom>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="search_input" placeholder="search songs, singers, heroes">
+                <buttom id="search-btn" class="btn">search</buttom>
+            </div>
+            <section id="treading-section">
+                <h2>Treading Songs</h2>
+                <ul id="treading_songs"></ul>
+            </section>
+
+            <section id="favorites_section">
+                <h2>Your Favorties</h2>
+                <ul id="favorite-songs">
+                </ul>
+            </section>
+
+            <section id="singers-section">
+                <h2>Top Singers</h2>
+                <ul id="top-singers"></ul>
+            </section>
+        </div>
+
+        <script src="App.js"></script>
+    </body>
+</html>

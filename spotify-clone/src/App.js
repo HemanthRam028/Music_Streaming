@@ -1,38 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // Import the CSS file
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, getRedirectResult } from 'firebase/auth';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { auth, db, provider } from './firebaseConfig';
+import { signInWithPopup, signOut, getRedirectResult } from 'firebase/auth';
+import { addDoc, collection } from 'firebase/firestore';
+import { loginToSpotify, getAccessTokenFromUrl } from './spotifyAuth';
+import { searchSongs, getNewReleases, getFeaturedPlaylists } from './spotifyApi';
+import HomePage from './HomePage';
+import FavoritesPage from './FavoritesPage';
+import PlaylistsPage from './PlaylistsPage';
+import SpotifyPlayer from './SpotifyPlayer';
+import './App.css';
 
-// Your Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCmBqUL9Ck-EyiHkk8Q_e1EPU260cd22ko",
-  authDomain: "musicstreaming-c2d8d.firebaseapp.com",
-  projectId: "musicstreaming-c2d8d",
-  storageBucket: "musicstreaming-c2d8d.appspot.com",
-  messagingSenderId: "322471070754",
-  appId: "1:322471070754:web:fa8c62d51393a67028ce7b",
-  measurementId: "G-TZCD1QD92N"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
-  prompt: 'select_account'
-});
-
-function App() {
+const App = () => {
   const [user, setUser] = useState(null);
-  const [songs, setSongs] = useState([]);
+  const [newReleases, setNewReleases] = useState([]);
+  const [featuredPlaylists, setFeaturedPlaylists] = useState([]);
+  const [spotifyAccessToken, setSpotifyAccessToken] = useState('');
+  const navigate = useNavigate();
 
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      setUser(user);
+      setUser(result.user);
     } catch (error) {
       console.error("Error during sign-in:", error.message);
     }
@@ -41,7 +30,8 @@ function App() {
   const signOutUser = async () => {
     try {
       await signOut(auth);
-      setUser(null); // Clear user state
+      setUser(null);
+      navigate('/');
     } catch (error) {
       console.error("Error during sign-out:", error.message);
     }
@@ -50,35 +40,43 @@ function App() {
   useEffect(() => {
     getRedirectResult(auth)
       .then((result) => {
-        if (result) {
-          const user = result.user;
-          setUser(user);
-        }
+        if (result) setUser(result.user);
       })
       .catch((error) => {
         console.error("Error during sign-in:", error.message);
       });
   }, []);
 
-  const fetchTrendingSongs = async () => {
-    const API_KEY = "YOUR_YOUTUBE_API_KEY";
-    try {
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=10&regionCode=IN&key=${API_KEY}`);
-      const data = await response.json();
-      setSongs(data.items);
-    } catch (error) {
-      console.error("Error fetching songs:", error.message);
+  useEffect(() => {
+    if (user) navigate('/home');
+  }, [user, navigate]);
+
+  useEffect(() => {
+    const token = getAccessTokenFromUrl();
+    if (token) {
+      setSpotifyAccessToken(token);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const loadMusicData = async () => {
+      const fetchedNewReleases = await getNewReleases();
+      const fetchedPlaylists = await getFeaturedPlaylists();
+      setNewReleases(fetchedNewReleases);
+      setFeaturedPlaylists(fetchedPlaylists);
+    };
+    loadMusicData();
+  }, []);
 
   const addToFavorites = async (songId) => {
     if (user) {
       try {
         await addDoc(collection(db, 'favorites'), {
           googleId: user.uid,
-          songId: songId
+          songId: songId,
         });
         console.log('Added to Favorites');
+        navigate('/favorites');
       } catch (error) {
         console.error('Error adding to favorites:', error.message);
       }
@@ -87,44 +85,58 @@ function App() {
     }
   };
 
-  return (
-    <div className="app-container">
-      <div className="header">Login Music Streaming</div>
-      <div className="logo-container">
-        <img src="Music_logo.png" alt="Music Logo" className="logo" />
-      </div>
+  const removeFromFavorites = async (songId) => {
+    if (user) {
+      // Implement removal logic here
+    } else {
+      alert('Please log in to remove favorites');
+    }
+  };
 
-      {!user ? (
-        <button onClick={signInWithGoogle} className="signin-button">
-          Sign in with Google
-        </button>
-      ) : (
-        <>
-          <button onClick={signOutUser} className="signout-button">
-            Sign out
-          </button>
-          <h2>Welcome, {user.displayName}</h2>
-          <button onClick={fetchTrendingSongs}>
-            Show Trending Songs
-          </button>
-          <div>
-            <h2>Trending Songs</h2>
-            <ul>
-              {songs.map(song => (
-                <li key={song.id}>
-                  <a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">
-                    {song.snippet.title}
-                  </a>
-                  <button className="favorite-btn" onClick={() => addToFavorites(song.id)}>
-                    Add to Favorites
-                  </button>
-                </li>
-              ))}
-            </ul>
+  return (
+    <Routes>
+      <Route path="/" element={
+        <div className="app-container">
+          <div className="header">Login Music Streaming</div>
+          <div className="logo-container">
+            <img src="Music_logo.png" alt="Music Logo" className="logo" />
           </div>
-        </>
-      )}
-    </div>
+          {!user ? (
+            <button onClick={signInWithGoogle} className="signin-button">Sign in with Google</button>
+          ) : <p>Redirecting...</p>}
+        </div>
+      } />
+      
+      <Route path="/home" element={
+        <HomePage
+          user={user}
+          signOutUser={signOutUser}
+          addToFavorites={addToFavorites}
+          removeFromFavorites={removeFromFavorites}
+          searchSongs={searchSongs}
+          newReleases={newReleases}
+          featuredPlaylists={featuredPlaylists}
+        />
+      } />
+      
+      <Route path="/favorites" element={
+        <FavoritesPage user={user} signOutUser={signOutUser} />
+      } />
+      
+      <Route path="/playlists" element={
+        <PlaylistsPage user={user} signOutUser={signOutUser} />
+      } />
+      
+      <Route path="/spotify" element={
+        <div className="App">
+          {!spotifyAccessToken ? (
+            <button onClick={loginToSpotify}>Login to Spotify</button>
+          ) : (
+            <SpotifyPlayer accessToken={spotifyAccessToken} />
+          )}
+        </div>
+      } />
+    </Routes>
   );
 }
 

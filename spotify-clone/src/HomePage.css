@@ -1,0 +1,87 @@
+.homepage-container {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+}
+
+.logo {
+  font-size: 24px;
+}
+
+.nav-buttons {
+  display: flex;
+}
+
+.nav-button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background-color: #45a049;
+}
+
+.main-content {
+  margin-top: 20px;
+}
+
+.trending-section, .new-releases-section, .search-section {
+  margin-bottom: 40px;
+}
+
+.song-cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.song-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 10px;
+  width: 200px;
+  text-align: center;
+}
+
+.album-art {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.song-info {
+  margin-top: 10px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-controls .album-art {
+  width: 50px;
+  height: 50px;
+}
+
+.player-controls button {
+  padding: 10px;
+  font-size: 16px;
+}

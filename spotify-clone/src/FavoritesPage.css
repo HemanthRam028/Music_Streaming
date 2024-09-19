@@ -1,0 +1,86 @@
+/* Basic styling for the favorites page */
+.favorites-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    height: 100vh;
+    overflow: auto;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: #4a90e2;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo {
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .nav-buttons {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .nav-button {
+    background-color: #ffffff;
+    color: #4a90e2;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .nav-button:hover {
+    background-color: #357ab7;
+    color: #ffffff;
+  }
+  
+  /* Main content section styling */
+  .main-content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .favorite-songs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  /* Styling for individual favorite songs */
+  .favorite-song {
+    background-color: #fff;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: left;
+  }
+  
+  .favorite-song p {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
